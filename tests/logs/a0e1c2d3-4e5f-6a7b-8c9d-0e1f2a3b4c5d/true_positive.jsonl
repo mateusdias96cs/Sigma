@@ -1,0 +1,1 @@
+{"process": {"command_line": "tee /etc/cron.d/backdoor", "executable": "/usr/bin/tee", "pid": 1337, "parent": {"executable": "/usr/bin/bash", "pid": 1336}}, "user": {"name": "root"}, "host": {"name": "server01"}, "event": {"kind": "event", "category": "process", "type": "start", "action": "exec"}, "@timestamp": "2023-10-27T10:00:00.000Z"}

@@ -1,0 +1,44 @@
+title: Linux Cron Job Persistence via File Modification
+id: a0e1c2d3-4e5f-6a7b-8c9d-0e1f2a3b4c5d
+status: experimental
+description: Detects attempts to establish persistence by modifying or creating cron job files in /etc/cron.d/ or /var/spool/cron/crontabs/root, indicative of MITRE ATT&CK T1053.003.
+references:
+  - https://attack.mitre.org/techniques/T1053/003/
+author: Detection Engineer
+date: 2023-10-27
+tags:
+  - attack.persistence
+  - attack.t1053.003
+logsource:
+  product: linux
+  category: process_creation
+detection:
+  selection_cron_d_file_op:
+    process.command_line|contains:
+      - ' > /etc/cron.d/'
+      - ' >> /etc/cron.d/'
+      - ' /etc/cron.d/'
+  selection_root_crontab_file_op:
+    process.command_line|contains:
+      - ' > /var/spool/cron/crontabs/root'
+      - ' >> /var/spool/cron/crontabs/root'
+      - ' /var/spool/cron/crontabs/root'
+  selection_crontab_stdin:
+    process.executable|endswith: '/usr/bin/crontab'
+    process.command_line|contains: '-'
+  filter_crontab_safe_flags:
+    process.command_line|contains:
+      - '-l'
+      - '-r'
+      - '-e'
+      - '--help'
+      - '-h'
+      - '-V'
+      - '-v'
+  condition: 1 of selection_* and not filter_crontab_safe_flags
+falsepositives:
+  - Legitimate system administration scripts
+  - Automated deployment tools
+  - Configuration management systems that modify cron jobs
+  - Manual review is recommended
+level: high

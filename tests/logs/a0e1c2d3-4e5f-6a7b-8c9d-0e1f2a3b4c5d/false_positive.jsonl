@@ -1,0 +1,1 @@
+{"process": {"command_line": "crontab -l", "executable": "/usr/bin/crontab", "pid": 2001, "parent": {"executable": "/usr/bin/bash", "pid": 2000}}, "user": {"name": "analyst"}, "host": {"name": "server01"}, "event": {"kind": "event", "category": "process", "type": "start", "action": "exec"}, "@timestamp": "2023-10-27T10:05:00.000Z"}

@@ -47,6 +47,19 @@
       ]
     },
     {
+      "techniqueID": "T1053.003",
+      "score": 1,
+      "color": "#2e7d32",
+      "comment": "Linux Cron Job Persistence via File Modification",
+      "enabled": true,
+      "metadata": [
+        {
+          "name": "rules",
+          "value": "1"
+        }
+      ]
+    },
+    {
       "techniqueID": "T1059.004",
       "score": 1,
       "color": "#2e7d32",
@@ -129,11 +142,11 @@
   "metadata": [
     {
       "name": "rule_count",
-      "value": "6"
+      "value": "7"
     },
     {
       "name": "technique_count",
-      "value": "7"
+      "value": "8"
     }
   ],
   "showTacticRowBackground": false,
