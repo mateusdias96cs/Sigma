@@ -1,0 +1,27 @@
+# pySigma processing pipeline: map Sigma process_creation fields to Elastic
+# Common Schema (ECS), the schema used by Elastic Agent / Auditbeat for Linux.
+#
+# The rules in this repository are already authored against ECS field names
+# (e.g. `process.command_line`), so for them this pipeline is a no-op. The
+# mappings below let rules written with the more common Sysmon/Windows-style
+# field names (Image, CommandLine, ...) convert cleanly too, which keeps the
+# door open for importing community rules without rewriting them.
+name: ecs-linux-process-creation
+priority: 100
+transformations:
+    - id: map-process-creation-fields-to-ecs
+      type: field_name_mapping
+      mapping:
+          Image: process.executable
+          OriginalFileName: process.name
+          CommandLine: process.command_line
+          ParentImage: process.parent.executable
+          ParentCommandLine: process.parent.command_line
+          CurrentDirectory: process.working_directory
+          User: user.name
+          LogonId: user.id
+          ProcessId: process.pid
+          TargetFilename: file.path
+      rule_conditions:
+          - type: logsource
+            category: process_creation
