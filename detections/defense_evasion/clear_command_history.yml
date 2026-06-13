@@ -1,0 +1,40 @@
+title: Shell Command History Cleared or Disabled
+id: 7f3a1e20-0a04-4a10-9e01-a1b2c3d4e004
+status: experimental
+description: |
+    Detects attempts to clear or disable shell command history to hinder
+    incident response — for example `history -c`, unsetting `HISTFILE`, or
+    deleting/truncating a `.bash_history` file. This is a defense-evasion
+    behaviour usually seen right after hands-on-keyboard activity.
+references:
+    - https://attack.mitre.org/techniques/T1070/003/
+author: sentinel-as-code
+date: 2026-01-15
+modified: 2026-01-15
+tags:
+    - attack.defense_evasion
+    - attack.t1070.003
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    selection_history_cmd:
+        process.command_line|contains:
+            - 'history -c'
+            - 'unset HISTFILE'
+            - 'export HISTFILESIZE=0'
+            - 'set +o history'
+    selection_history_file:
+        process.command_line|contains: '.bash_history'
+    selection_destroy:
+        process.command_line|contains:
+            - 'rm '
+            - 'shred '
+            - 'truncate '
+            - 'cat /dev/null >'
+            - ': >'
+    condition: selection_history_cmd or (selection_history_file and selection_destroy)
+falsepositives:
+    - Users intentionally housekeeping their own shell history. Rare on servers;
+      review in context.
+level: medium

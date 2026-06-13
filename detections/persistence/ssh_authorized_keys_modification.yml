@@ -1,0 +1,32 @@
+title: SSH authorized_keys Modified via Shell Redirection
+id: 7f3a1e20-0a02-4a10-9e01-a1b2c3d4e002
+status: experimental
+description: |
+    Detects a new public key being appended to an `authorized_keys` file from a
+    shell, a common SSH-based persistence technique. Adversaries append their
+    own key so they can log back in over SSH even if the compromised credential
+    is rotated.
+references:
+    - https://attack.mitre.org/techniques/T1098/004/
+author: sentinel-as-code
+date: 2026-01-15
+modified: 2026-01-15
+tags:
+    - attack.persistence
+    - attack.t1098.004
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    selection_file:
+        process.command_line|contains: 'authorized_keys'
+    selection_write:
+        process.command_line|contains:
+            - '>>'
+            - '>'
+            - 'tee '
+    condition: selection_file and selection_write
+falsepositives:
+    - Configuration management tools (Ansible, Puppet, cloud-init) provisioning
+      keys. Allow-list the known automation accounts and hosts.
+level: high
