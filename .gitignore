@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+dist/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Build artifacts (derived from Sigma — never the source of truth)
+build/
+
+# AI-generated drafts are local, human-reviewed output (keep the folder, not its contents)
+drafts/*
+!drafts/.gitkeep
+
+# Secrets — only *.example files belong in the repo
+.env
+*.env
+!*.example.env
+config/elastic.env
+
+# Local tooling / editor config
+.claude/
+
+# Internal build prompt — not part of the product
+sigma.md
+
+# OS / editor cruft
+.DS_Store
+*.swp

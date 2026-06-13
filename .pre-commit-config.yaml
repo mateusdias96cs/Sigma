@@ -1,0 +1,36 @@
+# Pre-commit hooks: run linting, YAML checks and Sigma validation before every
+# commit so broken rules never reach the repository.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-yaml
+        # Sigma rules and compose files are validated by dedicated hooks below.
+        exclude: ^(detections/|docker-compose\.yml)
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.5
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        files: ^(detections|config)/.*\.ya?ml$
+
+  # Local hook: validate Sigma rules with the project's own validator.
+  - repo: local
+    hooks:
+      - id: sentinel-validate
+        name: sentinel validate (Sigma rules)
+        entry: sentinel validate
+        language: system
+        files: ^detections/.*\.ya?ml$
+        pass_filenames: false

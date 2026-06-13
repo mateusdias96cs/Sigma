@@ -1,0 +1,22 @@
+# yamllint configuration for Sigma rules and config files.
+# Sigma rules are human-authored; we keep the rules pragmatic but strict on
+# the things that break parsing.
+extends: default
+
+rules:
+  line-length:
+    max: 120
+    level: warning
+  document-start:
+    present: false
+  truthy:
+    # Sigma uses bare `true`/`false`; allow them without warnings.
+    allowed-values: ["true", "false"]
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
+  indentation:
+    spaces: 4
+    indent-sequences: true
+  empty-lines:
+    max: 2
