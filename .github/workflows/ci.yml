@@ -1,0 +1,56 @@
+name: CI
+
+# Validate, test and measure coverage on every pull request. The offline
+# detection engine means the whole suite runs without Elasticsearch.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  detection-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Lint (ruff)
+        run: |
+          uv run ruff check src tests
+          uv run ruff format --check src tests
+
+      - name: Lint Sigma YAML (yamllint)
+        run: uv run yamllint detections config
+
+      - name: Validate Sigma rules
+        run: uv run sentinel validate
+
+      - name: Run offline TP/FP detection tests
+        run: uv run sentinel test
+
+      - name: Pytest suite
+        run: uv run pytest
+
+      - name: Generate ATT&CK coverage
+        run: uv run sentinel coverage
+
+      - name: Upload coverage summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: attack-coverage
+          path: |
+            coverage/coverage_summary.md
+            coverage/navigator_layer.json

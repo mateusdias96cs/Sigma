@@ -1,0 +1,48 @@
+name: CD
+
+# Convert rules and deploy them to the Elastic Detection Engine on every push
+# to main. Secrets come from GitHub Secrets and are never echoed.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-detections
+  cancel-in-progress: false
+
+jobs:
+  convert-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+      ELASTIC_API_KEY: ${{ secrets.ELASTIC_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Validate rules before shipping
+        run: uv run sentinel validate
+
+      - name: Convert rules to Elastic NDJSON
+        run: uv run sentinel convert
+
+      - name: Deploy to Elastic Detection Engine (idempotent)
+        # Skip gracefully when no target SIEM is configured, so the pipeline
+        # stays green until ELASTIC_URL is provided as a repository secret.
+        if: ${{ env.ELASTIC_URL != '' }}
+        run: uv run sentinel deploy
